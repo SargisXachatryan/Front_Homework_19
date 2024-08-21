@@ -4,24 +4,23 @@ import { getAccount, handelCancelation, handleFollow, handleUnfollow } from "../
 import { IAccount } from "../../../helpers/types"
 import { BASE, DEF } from "../../../helpers/default"
 import { Gallery } from "../../../components/Gallery"
+
 export const Account = () => {
     const { id } = useParams()
     const [user, setUser] = useState<IAccount | null>(null)
-    const [photos,setPhotos] = useState<IAccount[]>([])
     const navigate = useNavigate()
     useEffect(() => {
         if (!id) {
             return
         }
         getAccount(id)
-            .then(response => {   
+            .then(response => {
                 if (!response.payload || response.status == "error") {
                     return navigate("/profile/search")
                 }
                 setUser(response.payload as IAccount)
-                setPhotos(response.payload as IAccount[])
             })
-    }, [id,user?.followers,user?.following])
+    }, [id, user?.followers, user?.following ,user?.posts])
     const handleRequest = () => {
         if (user?.connection.following)
             unfollow()
@@ -32,38 +31,38 @@ export const Account = () => {
     }
 
     const follow = () => {
-        if(user?.id){
+        if (user?.id) {
             handleFollow(user.id)
-            .then(response => {
-                if(response.status == 'following'){
-                    setUser({...user, connection:{...user.connection, following:true} })
-                }else if(response.status == 'requested'){
-                    setUser({...user, connection:{...user.connection, requested:true} })
-                }
-            })
+                .then(response => {
+                    if (response.status == 'following') {
+                        setUser({ ...user, connection: { ...user.connection, following: true } })
+                    } else if (response.status == 'requested') {
+                        setUser({ ...user, connection: { ...user.connection, requested: true } })
+                    }
+                })
         }
     }
     const unfollow = () => {
-        if(user?.id){
+        if (user?.id) {
             handleUnfollow(user.id)
-            .then(response => {
-                if(response.status == 'unfollowed'){
-                    setUser({...user, connection:{...user.connection, following:false} })
-                }
-            })
+                .then(response => {
+                    if (response.status == 'unfollowed') {
+                        setUser({ ...user, connection: { ...user.connection, following: false } })
+                    }
+                })
         }
     }
     const cancelRequest = () => {
-        if(user?.id){
+        if (user?.id) {
             handelCancelation(user.id)
-            .then(response => {
-                if(response.status == 'cancelled'){
-                    setUser({...user, connection:{...user.connection, requested:false} })
-                }
-            })
+                .then(response => {
+                    if (response.status == 'cancelled') {
+                        setUser({ ...user, connection: { ...user.connection, requested: false } })
+                    }
+                })
         }
     }
-    
+
 
     return user && <div className="container mt-5 mb-5">
         <div className="row no-gutters">
@@ -104,15 +103,15 @@ export const Account = () => {
                     <div className="d-flex flex-row text-white">
                         <div className="p-4 bg-primary text-center skill-block">
                             <h4>{user.followers?.length || 0}</h4>
-                            <h6>follower{user.followers?.length!>1?"s":""}</h6>
+                            <h6>follower{user.followers?.length! > 1 ? "s" : ""}</h6>
                         </div>
                         <div className="p-3 bg-success text-center skill-block">
                             <h4>{user.following?.length || 0}</h4>
                             <h6>following</h6>
                         </div>
                         <div className="p-3 bg-danger text-center skill-block">
-                            <h4>{photos.posts?.length || 0} </h4>
-                            <h6>post{user.posts?.length!>1?"s":""}</h6>
+                            <h4>{user.posts.length || 0} </h4>
+                            <h6>post{user.posts?.length! > 1 ? "s" : ""}</h6>
                         </div>
                     </div>
                 </div>
